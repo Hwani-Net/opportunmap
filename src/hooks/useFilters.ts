@@ -22,8 +22,9 @@ export function useFilters() {
     showPast: searchParams.get("showPast") === "true",
   };
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
   const viewMode: ViewMode =
-    (searchParams.get("view") as ViewMode) ?? "calendar";
+    (searchParams.get("view") as ViewMode) ?? (isMobile ? "list" : "calendar");
   const detailId = searchParams.get("detail");
 
   const updateFilters = useCallback(

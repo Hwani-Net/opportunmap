@@ -40,7 +40,7 @@ export default function FilterBar({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2.5 overflow-x-auto flex-nowrap pb-1">
         {ALL_CATEGORIES.map((cat) => {
           const isActive = filters.categories.has(cat);
           const colors = CATEGORY_COLORS[cat];

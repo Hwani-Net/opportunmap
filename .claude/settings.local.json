@@ -9,7 +9,11 @@
       "mcp__stitch__fetch_screen_image",
       "mcp__stitch__fetch_screen_code",
       "mcp__stitch-design-audit__audit_design_files",
-      "mcp__tavily__tavily_extract"
+      "mcp__tavily__tavily_extract",
+      "Bash(echo \"\")",
+      "Bash(cat)",
+      "mcp__expect__open",
+      "mcp__expect__screenshot"
     ]
   },
   "outputStyle": "default",

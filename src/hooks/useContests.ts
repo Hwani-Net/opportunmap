@@ -26,7 +26,6 @@ export function useContests() {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    setLoading(true);
     const unsub = subscribeContests(
       (data) => {
         setContests(data);

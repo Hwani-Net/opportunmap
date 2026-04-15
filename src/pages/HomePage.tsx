@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
 import CalendarView from "../components/calendar/CalendarView";
 import ListView from "../components/list/ListView";
 import FilterBar from "../components/filters/FilterBar";
@@ -62,7 +63,7 @@ export default function HomePage() {
         onSearchChange={(search) => updateFilters({ search })}
       />
 
-      <main className="max-w-[1400px] mx-auto px-8 pb-20">
+      <main className="max-w-[1400px] mx-auto px-4 md:px-8 pb-20">
         {/* View toggle */}
         <div className="flex items-center justify-end mb-6 pt-2">
           <div
@@ -99,9 +100,25 @@ export default function HomePage() {
         />
 
         {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="w-6 h-6 border-2 border-[#3B5BDB] border-t-transparent rounded-full animate-spin" />
-          </div>
+          viewMode === "list" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl p-5 animate-pulse"
+                  style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+                >
+                  <div className="h-4 bg-[#F3F4F6] rounded mb-3 w-1/3" />
+                  <div className="h-5 bg-[#F3F4F6] rounded mb-2 w-3/4" />
+                  <div className="h-4 bg-[#F3F4F6] rounded w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-24">
+              <div className="w-6 h-6 border-2 border-[#3B5BDB] border-t-transparent rounded-full animate-spin" />
+            </div>
+          )
         ) : viewMode === "calendar" ? (
           <CalendarView contests={filtered} onSelectContest={setDetailId} />
         ) : (
@@ -109,9 +126,9 @@ export default function HomePage() {
         )}
 
         {/* Metric Cards */}
-        <div className="grid grid-cols-3 gap-5 mt-10">
+        <div className="grid grid-cols-3 gap-3 md:gap-5 mt-10">
           <div
-            className="bg-white rounded-2xl p-6"
+            className="bg-white rounded-2xl p-4 md:p-6"
             style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
           >
             <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-2">
@@ -125,7 +142,7 @@ export default function HomePage() {
             </p>
           </div>
           <div
-            className="bg-white rounded-2xl p-6"
+            className="bg-white rounded-2xl p-4 md:p-6"
             style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
           >
             <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-2">
@@ -139,7 +156,7 @@ export default function HomePage() {
             </p>
           </div>
           <div
-            className="bg-white rounded-2xl p-6"
+            className="bg-white rounded-2xl p-4 md:p-6"
             style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
           >
             <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-2">
@@ -154,6 +171,8 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+
+      <Footer />
 
       <ContestDetailModal
         contest={selectedContest}

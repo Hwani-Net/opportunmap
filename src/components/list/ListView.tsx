@@ -9,13 +9,13 @@ interface ListViewProps {
 export default function ListView({ contests, onSelectContest }: ListViewProps) {
   if (contests.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-4xl mb-4">📭</p>
-        <p className="text-[var(--color-text-secondary)]">
-          조건에 맞는 공고가 없습니다
+      <div className="text-center py-20">
+        <p className="text-4xl mb-4">🔍</p>
+        <p className="text-[#1A1A2E] font-semibold text-base mb-2">
+          검색 결과가 없습니다
         </p>
-        <p className="text-sm text-[var(--color-text-muted)] mt-1">
-          필터를 조정해 보세요
+        <p className="text-[#9CA3AF] text-sm">
+          필터를 조정하거나 검색어를 변경해보세요
         </p>
       </div>
     );
