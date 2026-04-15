@@ -19,7 +19,16 @@ export default function ContestCard({ contest, onClick }: ContestCardProps) {
   return (
     <article
       onClick={() => onClick(contest.id)}
-      className="bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-0.5 flex"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick(contest.id);
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`${contest.title} 상세보기`}
+      className="bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-0.5 flex focus:outline-none focus:ring-2 focus:ring-[#3B5BDB]"
       style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       onMouseEnter={(e) => {
         (e.currentTarget as HTMLElement).style.boxShadow =

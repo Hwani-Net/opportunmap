@@ -22,10 +22,14 @@ export function subscribeContests(
   return onSnapshot(
     q,
     (snapshot) => {
-      const contests: Contest[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Contest[];
+      const contests: Contest[] = snapshot.docs
+        .map((doc) => {
+          const data = doc.data();
+          if (!data.title || !data.category || !data.applicationEnd)
+            return null;
+          return { id: doc.id, ...data } as Contest;
+        })
+        .filter((c): c is Contest => c !== null);
       callback(contests);
     },
     (error) => {

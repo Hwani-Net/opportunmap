@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -18,14 +19,35 @@ export default function CalendarView({
   contests,
   onSelectContest,
 }: CalendarViewProps) {
-  const events = contests.map((c) => ({
-    id: c.id,
-    title: c.title,
-    start: c.applicationEnd.toDate(),
-    backgroundColor: "transparent",
-    borderColor: "transparent",
-    extendedProps: { category: c.category, organizer: c.organizer },
-  }));
+  const events = useMemo(
+    () =>
+      contests.map((c) => {
+        const endDate = c.applicationEnd.toDate();
+        // FullCalendar end is exclusive, add 1 day so deadline day is included
+        const endExclusive = new Date(endDate);
+        endExclusive.setDate(endExclusive.getDate() + 1);
+        return {
+          id: c.id,
+          title: c.title,
+          start: c.applicationStart.toDate(),
+          end: endExclusive,
+          backgroundColor: "transparent",
+          borderColor: "transparent",
+          extendedProps: { category: c.category, organizer: c.organizer },
+        };
+      }),
+    [contests],
+  );
+
+  if (contests.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <p className="text-4xl mb-4">📭</p>
+        <p className="text-[#6B7280]">조건에 맞는 공고가 없습니다</p>
+        <p className="text-sm text-[#9CA3AF] mt-1">필터를 조정해 보세요</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

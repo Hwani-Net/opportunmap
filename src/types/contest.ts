@@ -19,6 +19,7 @@ export interface Contest {
   sourceUrl: string;
   checklist: string[];
   isActive: boolean;
+  createdAt?: Timestamp;
 }
 
 export const CATEGORY_LABEL: Record<Category, string> = {

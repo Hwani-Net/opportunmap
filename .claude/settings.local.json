@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__tavily__tavily_search",
+      "mcp__perplexity__perplexity_search",
+      "mcp__stitch__create_project",
+      "mcp__stitch__generate_screen_from_text",
+      "mcp__stitch__list_screens",
+      "mcp__stitch__fetch_screen_image",
+      "mcp__stitch__fetch_screen_code",
+      "mcp__stitch-design-audit__audit_design_files",
+      "mcp__tavily__tavily_extract"
+    ]
+  },
+  "outputStyle": "default",
+  "spinnerTipsEnabled": false,
+  "prefersReducedMotion": false
+}

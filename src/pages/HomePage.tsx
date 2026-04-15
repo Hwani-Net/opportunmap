@@ -38,7 +38,11 @@ export default function HomePage() {
     const d = c.applicationEnd.toDate();
     return d >= now && d <= thisWeekEnd;
   }).length;
-  const recentlyAdded = contests.length > 7 ? 7 : contests.length;
+  const sevenDaysAgo = new Date(now);
+  sevenDaysAgo.setDate(now.getDate() - 7);
+  const recentlyAdded = contests.filter((c) =>
+    c.createdAt ? c.createdAt.toDate() >= sevenDaysAgo : false,
+  ).length;
 
   if (error) {
     return (
@@ -67,7 +71,7 @@ export default function HomePage() {
           >
             <button
               onClick={() => setViewMode("calendar")}
-              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-[#3B5BDB] ${
                 viewMode === "calendar"
                   ? "bg-[#1A1A2E] text-white"
                   : "text-[#6B7280] hover:text-[#1A1A2E]"
@@ -77,7 +81,7 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-[#3B5BDB] ${
                 viewMode === "list"
                   ? "bg-[#1A1A2E] text-white"
                   : "text-[#6B7280] hover:text-[#1A1A2E]"

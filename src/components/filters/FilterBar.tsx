@@ -3,6 +3,7 @@ import type { Category } from "../../types/contest";
 import { CATEGORY_COLORS } from "../../constants";
 import { CATEGORY_LABEL } from "../../types/contest";
 import { FIELD_OPTIONS, TARGET_OPTIONS, REGION_OPTIONS } from "../../constants";
+import { DEFAULT_FILTERS } from "../../hooks/useContests";
 
 interface FilterBarProps {
   filters: FilterState;
@@ -17,6 +18,16 @@ export default function FilterBar({
   onUpdate,
   contestCount,
 }: FilterBarProps) {
+  const isFiltered =
+    filters.field !== "" ||
+    filters.target !== "" ||
+    filters.region !== "" ||
+    filters.search !== "" ||
+    filters.showPast ||
+    filters.categories.size < 4;
+
+  const resetFilters = () => onUpdate({ ...DEFAULT_FILTERS });
+
   const toggleCategory = (cat: Category) => {
     const next = new Set(filters.categories);
     if (next.has(cat)) {
@@ -55,13 +66,23 @@ export default function FilterBar({
         <span className="text-xs text-[#9CA3AF] ml-2 font-medium">
           {contestCount}건
         </span>
+        {isFiltered && (
+          <button
+            onClick={resetFilters}
+            aria-label="필터 초기화"
+            className="ml-1 text-xs text-[#6B7280] hover:text-[#E03131] transition-colors underline underline-offset-2 focus:outline-none focus:ring-2 focus:ring-[#3B5BDB] rounded px-1"
+          >
+            초기화
+          </button>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
         <select
           value={filters.field}
           onChange={(e) => onUpdate({ field: e.target.value })}
-          className="px-4 py-2 bg-white rounded-lg text-sm font-medium text-[#1A1A2E] border-none cursor-pointer outline-none"
+          aria-label="분야 필터"
+          className="px-4 py-2 bg-white rounded-lg text-sm font-medium text-[#1A1A2E] border-none cursor-pointer outline-none focus:ring-2 focus:ring-[#3B5BDB]"
           style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
         >
           <option value="">분야</option>
@@ -74,7 +95,8 @@ export default function FilterBar({
         <select
           value={filters.target}
           onChange={(e) => onUpdate({ target: e.target.value })}
-          className="px-4 py-2 bg-white rounded-lg text-sm font-medium text-[#1A1A2E] border-none cursor-pointer outline-none"
+          aria-label="대상 필터"
+          className="px-4 py-2 bg-white rounded-lg text-sm font-medium text-[#1A1A2E] border-none cursor-pointer outline-none focus:ring-2 focus:ring-[#3B5BDB]"
           style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
         >
           <option value="">대상</option>
@@ -87,7 +109,8 @@ export default function FilterBar({
         <select
           value={filters.region}
           onChange={(e) => onUpdate({ region: e.target.value })}
-          className="px-4 py-2 bg-white rounded-lg text-sm font-medium text-[#1A1A2E] border-none cursor-pointer outline-none"
+          aria-label="지역 필터"
+          className="px-4 py-2 bg-white rounded-lg text-sm font-medium text-[#1A1A2E] border-none cursor-pointer outline-none focus:ring-2 focus:ring-[#3B5BDB]"
           style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
         >
           <option value="">지역</option>

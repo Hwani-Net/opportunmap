@@ -73,7 +73,8 @@ export default function ContestDetailModal({
           </div>
           <button
             onClick={onClose}
-            className="text-[#9CA3AF] hover:text-[#1A1A2E] transition-colors p-1 shrink-0"
+            aria-label="닫기"
+            className="text-[#9CA3AF] hover:text-[#1A1A2E] transition-colors p-1 shrink-0 focus:outline-none focus:ring-2 focus:ring-[#3B5BDB] rounded"
           >
             <svg
               width="20"
