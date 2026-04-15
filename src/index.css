@@ -139,6 +139,9 @@ body {
 .fc .fc-daygrid-dot-event {
   padding: 2px 0 !important;
 }
+body.detail-modal-open .fc-popover {
+  display: none !important;
+}
 .fc .fc-daygrid-more-link {
   font-size: 11px !important;
   color: #3b5bdb !important;

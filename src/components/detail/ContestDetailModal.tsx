@@ -27,9 +27,11 @@ export default function ContestDetailModal({
     };
     document.addEventListener("keydown", handler);
     document.body.style.overflow = "hidden";
+    document.body.classList.add("detail-modal-open");
     return () => {
       document.removeEventListener("keydown", handler);
       document.body.style.overflow = "";
+      document.body.classList.remove("detail-modal-open");
     };
   }, [contest, onClose]);
 
@@ -53,7 +55,7 @@ export default function ContestDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[10000] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
