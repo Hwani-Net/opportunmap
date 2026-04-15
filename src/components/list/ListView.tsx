@@ -28,7 +28,7 @@ export default function ListView({
   }
 
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
       {contests.map((c) => (
         <ContestCard
           key={c.id}

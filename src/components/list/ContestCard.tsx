@@ -40,7 +40,7 @@ export default function ContestCard({
       : `D-${daysLeft}`;
 
   return (
-    <article
+    <div
       onClick={() => onClick(contest.id)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -110,7 +110,7 @@ export default function ContestCard({
           )}
         </div>
 
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
+        <div className="flex flex-col items-end gap-1.5 shrink-0 max-w-[9rem]">
           <div className="flex items-center gap-1">
             {/* [PP-045] 북마크 버튼 */}
             {onToggleBookmark && (
@@ -176,10 +176,12 @@ export default function ContestCard({
             })}
           </p>
           {contest.prize && (
-            <p className="text-xs text-[#6B7280]">{contest.prize}</p>
+            <p className="text-xs text-[#6B7280] text-right line-clamp-2 break-keep">
+              {contest.prize}
+            </p>
           )}
         </div>
       </div>
-    </article>
+    </div>
   );
 }

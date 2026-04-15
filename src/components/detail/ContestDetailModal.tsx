@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Contest } from "../../types/contest";
 import { CATEGORY_LABEL } from "../../types/contest";
 import { CATEGORY_COLORS } from "../../constants";
@@ -6,12 +6,17 @@ import { CATEGORY_COLORS } from "../../constants";
 interface ContestDetailModalProps {
   contest: Contest | null;
   onClose: () => void;
+  bookmarks: Set<string>;
+  onToggleBookmark: (id: string) => void;
 }
 
 export default function ContestDetailModal({
   contest,
   onClose,
+  bookmarks,
+  onToggleBookmark,
 }: ContestDetailModalProps) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [checked, setChecked] = useState<boolean[]>(() => {
     if (!contest) return [];
     const saved = localStorage.getItem(`checklist-${contest.id}`);
@@ -19,9 +24,11 @@ export default function ContestDetailModal({
       ? JSON.parse(saved)
       : new Array(contest.checklist.length).fill(false);
   });
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!contest) return;
+    closeButtonRef.current?.focus();
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -47,11 +54,45 @@ export default function ContestDetailModal({
       day: "numeric",
     });
 
+  // D-day 계산 (C3)
+  const now = new Date();
+  const daysLeft = Math.ceil(
+    (end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  const getDdayBadge = () => {
+    if (daysLeft < 0)
+      return { label: "마감됨", bg: "#F3F4F6", color: "#9CA3AF" };
+    if (daysLeft === 0)
+      return { label: "오늘 마감", bg: "#FEE2E2", color: "#E03131" };
+    if (daysLeft <= 7)
+      return { label: `D-${daysLeft}`, bg: "#FEE2E2", color: "#E03131" };
+    if (daysLeft <= 30)
+      return { label: `D-${daysLeft}`, bg: "#FEF3C7", color: "#E8590C" };
+    return null;
+  };
+  const ddayBadge = getDdayBadge();
+
   const toggleCheck = (i: number) => {
     const next = checked.map((v, idx) => (idx === i ? !v : v));
     setChecked(next);
     localStorage.setItem(`checklist-${contest.id}`, JSON.stringify(next));
   };
+
+  const clearAllChecks = () => {
+    const next = new Array(contest.checklist.length).fill(false);
+    setChecked(next);
+    localStorage.setItem(`checklist-${contest.id}`, JSON.stringify(next));
+  };
+
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(
+      window.location.origin + "/?detail=" + contest.id,
+    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const isBookmarked = bookmarks.has(contest.id);
 
   return (
     <div
@@ -67,8 +108,9 @@ export default function ContestDetailModal({
         {/* Color accent bar at top */}
         <div className="h-1 w-full" style={{ background: colors.main }} />
 
-        <div className="px-7 pt-6 pb-2 flex items-start justify-between">
-          <div>
+        {/* Sticky header (C5) */}
+        <div className="sticky top-0 bg-white z-10 px-7 pt-6 pb-2 flex items-start justify-between">
+          <div className="flex-1 min-w-0">
             <span
               className="text-[11px] font-bold uppercase tracking-wider"
               style={{ color: colors.main }}
@@ -86,30 +128,65 @@ export default function ContestDetailModal({
               {contest.title}
             </h2>
             <p className="text-sm text-[#6B7280] mt-1">{contest.organizer}</p>
+            {/* D-day 뱃지 (C3) */}
+            {ddayBadge && (
+              <span
+                className="inline-block mt-2 text-[11px] font-bold px-2.5 py-1 rounded-full"
+                style={{ background: ddayBadge.bg, color: ddayBadge.color }}
+              >
+                {ddayBadge.label}
+              </span>
+            )}
           </div>
-          <button
-            onClick={onClose}
-            aria-label="닫기"
-            className="text-[#9CA3AF] hover:text-[#1A1A2E] transition-colors p-1 shrink-0 focus:outline-none focus:ring-2 focus:ring-[#3B5BDB] rounded"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
+          <div className="flex items-center gap-1 shrink-0 ml-2">
+            {/* 북마크 버튼 (C1) */}
+            <button
+              onClick={() => onToggleBookmark(contest.id)}
+              aria-label={isBookmarked ? "북마크 해제" : "북마크 추가"}
+              className="p-1.5 rounded text-[#9CA3AF] hover:text-[#F59F00] transition-colors focus:outline-none focus:ring-2 focus:ring-[#3B5BDB]"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill={isBookmarked ? "#F59F00" : "none"}
+                stroke={isBookmarked ? "#F59F00" : "currentColor"}
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
+              </svg>
+            </button>
+            {/* 닫기 버튼 */}
+            <button
+              ref={closeButtonRef}
+              onClick={onClose}
+              aria-label="닫기"
+              className="text-[#9CA3AF] hover:text-[#1A1A2E] transition-colors p-1 focus:outline-none focus:ring-2 focus:ring-[#3B5BDB] rounded"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div className="px-7 py-5 space-y-5">
+          {/* 2×2 그리드 + field 추가 (C2) */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[#F7F8FA] rounded-xl p-3.5">
               <p className="text-[11px] text-[#6B7280] font-medium mb-1">
@@ -148,9 +225,29 @@ export default function ContestDetailModal({
                 {contest.region}
               </p>
             </div>
+            {contest.field && contest.field.length > 0 && (
+              <div className="bg-[#F7F8FA] rounded-xl p-3.5 col-span-2">
+                <p className="text-[11px] text-[#6B7280] font-medium mb-2">
+                  분야
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {contest.field.map((f) => (
+                    <span
+                      key={f}
+                      className="text-[11px] font-medium px-2 py-0.5 rounded-md"
+                      style={{
+                        background: `${colors.main}18`,
+                        color: colors.main,
+                      }}
+                    >
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* [PP-036] eligibility 렌더링 추가 */}
           {contest.eligibility && (
             <div className="bg-[#F7F8FA] rounded-xl p-3.5">
               <p className="text-[11px] text-[#6B7280] font-medium mb-1">
@@ -173,12 +270,26 @@ export default function ContestDetailModal({
             </div>
           )}
 
-          {/* [PP-038] 체크리스트 localStorage 저장 */}
-          {contest.checklist.length > 0 && (
-            <div>
-              <p className="text-[11px] text-[#6B7280] font-medium mb-2">
+          {/* 체크리스트 (C4, C6) */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] text-[#6B7280] font-medium">
                 필요 서류
               </p>
+              {contest.checklist.length > 0 && (
+                <button
+                  onClick={clearAllChecks}
+                  className="text-[11px] text-[#9CA3AF] hover:text-[#E03131] transition-colors"
+                >
+                  모두 해제
+                </button>
+              )}
+            </div>
+            {contest.checklist.length === 0 ? (
+              <p className="text-sm text-[#9CA3AF]">
+                필요 서류 정보가 없습니다.
+              </p>
+            ) : (
               <div className="space-y-1.5">
                 {contest.checklist.map((item, i) => (
                   <label
@@ -201,20 +312,22 @@ export default function ContestDetailModal({
                   </label>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div className="px-7 pb-6 flex gap-3">
-          <a
-            href={contest.applyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 py-3 text-center text-sm font-bold text-white rounded-xl transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            style={{ background: colors.main }}
-          >
-            지원하기 →
-          </a>
+          {contest.applyUrl && (
+            <a
+              href={contest.applyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 py-3 text-center text-sm font-bold text-white rounded-xl transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              style={{ background: colors.main }}
+            >
+              지원하기 →
+            </a>
+          )}
           <a
             href={contest.sourceUrl}
             target="_blank"
@@ -223,6 +336,13 @@ export default function ContestDetailModal({
           >
             원문
           </a>
+          {/* 링크 복사 버튼 (F1) */}
+          <button
+            onClick={copyLink}
+            className="px-5 py-3 text-sm font-semibold text-[#6B7280] bg-[#F7F8FA] rounded-xl hover:bg-[#EDEEF0] transition-colors"
+          >
+            {copied ? "✓ 복사됨" : "링크 복사"}
+          </button>
         </div>
       </div>
     </div>

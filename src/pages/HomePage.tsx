@@ -19,6 +19,8 @@ export default function HomePage() {
     setViewMode,
     detailId,
     setDetailId,
+    sortBy,
+    setSortBy,
   } = useFilters();
   const { bookmarks, toggle: toggleBookmark } = useBookmarks();
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
@@ -28,34 +30,61 @@ export default function HomePage() {
     [contests, filters],
   );
 
-  const displayed = useMemo(
-    () =>
-      showBookmarksOnly
-        ? filtered.filter((c) => bookmarks.has(c.id))
-        : filtered,
-    [filtered, showBookmarksOnly, bookmarks],
-  );
+  const displayed = useMemo(() => {
+    const base = showBookmarksOnly
+      ? filtered.filter((c) => bookmarks.has(c.id))
+      : filtered;
+
+    // 정렬 (D2)
+    return [...base].sort((a, b) => {
+      if (sortBy === "deadline") {
+        return (
+          a.applicationEnd.toDate().getTime() -
+          b.applicationEnd.toDate().getTime()
+        );
+      }
+      if (sortBy === "newest") {
+        const aTime = a.createdAt ? a.createdAt.toDate().getTime() : 0;
+        const bTime = b.createdAt ? b.createdAt.toDate().getTime() : 0;
+        return bTime - aTime;
+      }
+      if (sortBy === "prize") {
+        // 상금 숫자 파싱 (만원 단위 추출)
+        const parsePrize = (p?: string) => {
+          if (!p) return 0;
+          const m = p.replace(/,/g, "").match(/\d+/);
+          return m ? parseInt(m[0], 10) : 0;
+        };
+        return parsePrize(b.prize) - parsePrize(a.prize);
+      }
+      return 0;
+    });
+  }, [filtered, showBookmarksOnly, bookmarks, sortBy]);
 
   const selectedContest = detailId
     ? (getContestById(contests, detailId) ?? null)
     : null;
 
-  // Stats
-  const now = new Date();
-  const activeCount = contests.filter(
-    (c) => c.applicationEnd.toDate() >= now,
-  ).length;
-  const thisWeekEnd = new Date(now);
-  thisWeekEnd.setDate(now.getDate() + 7);
-  const weekDeadlines = contests.filter((c) => {
-    const d = c.applicationEnd.toDate();
-    return d >= now && d <= thisWeekEnd;
-  }).length;
-  const sevenDaysAgo = new Date(now);
-  sevenDaysAgo.setDate(now.getDate() - 7);
-  const recentlyAdded = contests.filter((c) =>
-    c.createdAt ? c.createdAt.toDate() >= sevenDaysAgo : false,
-  ).length;
+  // Stats (A5: useMemo 최적화)
+  const { activeCount, weekDeadlines, recentlyAdded } = useMemo(() => {
+    const now = new Date();
+    const thisWeekEnd = new Date(now);
+    thisWeekEnd.setDate(now.getDate() + 7);
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(now.getDate() - 7);
+
+    return {
+      activeCount: contests.filter((c) => c.applicationEnd.toDate() >= now)
+        .length,
+      weekDeadlines: contests.filter((c) => {
+        const d = c.applicationEnd.toDate();
+        return d >= now && d <= thisWeekEnd;
+      }).length,
+      recentlyAdded: contests.filter((c) =>
+        c.createdAt ? c.createdAt.toDate() >= sevenDaysAgo : false,
+      ).length,
+    };
+  }, [contests]);
 
   if (error) {
     return (
@@ -84,7 +113,7 @@ export default function HomePage() {
       />
 
       <main className="max-w-[1400px] mx-auto px-4 md:px-8 pb-20">
-        {/* [PP-001] 가치 제안 문구 */}
+        {/* 가치 제안 문구 */}
         <div className="pt-6 pb-2">
           <h1
             className="text-2xl font-extrabold text-[#1A1A2E]"
@@ -99,10 +128,55 @@ export default function HomePage() {
           </p>
         </div>
 
+        {/* 통계 카드 — FilterBar 위로 이동 (B1) */}
+        <div className="grid grid-cols-3 gap-3 md:gap-5 mt-4 mb-6">
+          <div
+            className="bg-white rounded-2xl p-4 md:p-6"
+            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+          >
+            <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">
+              진행 중
+            </p>
+            <p
+              className="text-2xl font-extrabold text-[#1A1A2E]"
+              style={{ fontFamily: "'Plus Jakarta Sans'" }}
+            >
+              {activeCount}건
+            </p>
+          </div>
+          <div
+            className="bg-white rounded-2xl p-4 md:p-6"
+            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+          >
+            <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">
+              이번 주 마감
+            </p>
+            <p
+              className="text-2xl font-extrabold text-[#E03131]"
+              style={{ fontFamily: "'Plus Jakarta Sans'" }}
+            >
+              {weekDeadlines}건
+            </p>
+          </div>
+          <div
+            className="bg-white rounded-2xl p-4 md:p-6"
+            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+          >
+            <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">
+              새로 등록
+            </p>
+            <p
+              className="text-2xl font-extrabold text-[#0CA678]"
+              style={{ fontFamily: "'Plus Jakarta Sans'" }}
+            >
+              {recentlyAdded}건
+            </p>
+          </div>
+        </div>
+
         {/* View toggle */}
-        <div className="flex items-center justify-between mb-6 pt-4">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            {/* [PP-045] 북마크 필터 버튼 */}
             <button
               onClick={() => setShowBookmarksOnly((v) => !v)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[#3B5BDB] ${
@@ -163,7 +237,9 @@ export default function HomePage() {
 
         <FilterBar
           filters={filters}
+          sortBy={sortBy}
           onUpdate={updateFilters}
+          onSortChange={setSortBy}
           contestCount={displayed.length}
         />
 
@@ -205,52 +281,6 @@ export default function HomePage() {
             onToggleBookmark={toggleBookmark}
           />
         )}
-
-        {/* Metric Cards */}
-        <div className="grid grid-cols-3 gap-3 md:gap-5 mt-10">
-          <div
-            className="bg-white rounded-2xl p-4 md:p-6"
-            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-          >
-            <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">
-              진행 중
-            </p>
-            <p
-              className="text-2xl font-extrabold text-[#1A1A2E]"
-              style={{ fontFamily: "'Plus Jakarta Sans'" }}
-            >
-              {activeCount}건
-            </p>
-          </div>
-          <div
-            className="bg-white rounded-2xl p-4 md:p-6"
-            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-          >
-            <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">
-              이번 주 마감
-            </p>
-            <p
-              className="text-2xl font-extrabold text-[#E03131]"
-              style={{ fontFamily: "'Plus Jakarta Sans'" }}
-            >
-              {weekDeadlines}건
-            </p>
-          </div>
-          <div
-            className="bg-white rounded-2xl p-4 md:p-6"
-            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-          >
-            <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">
-              새로 등록
-            </p>
-            <p
-              className="text-2xl font-extrabold text-[#0CA678]"
-              style={{ fontFamily: "'Plus Jakarta Sans'" }}
-            >
-              {recentlyAdded}건
-            </p>
-          </div>
-        </div>
       </main>
 
       <Footer />
@@ -259,6 +289,8 @@ export default function HomePage() {
         key={selectedContest?.id ?? "closed"}
         contest={selectedContest}
         onClose={() => setDetailId(null)}
+        bookmarks={bookmarks}
+        onToggleBookmark={toggleBookmark}
       />
     </div>
   );

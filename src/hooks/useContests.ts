@@ -57,13 +57,15 @@ export function filterContests(
 
     if (filters.target && !c.target.includes(filters.target)) return false;
 
-    if (filters.region && c.region !== filters.region) return false;
+    if (filters.region && !c.region.includes(filters.region)) return false;
 
     if (filters.search) {
       const q = filters.search.toLowerCase();
       if (
         !c.title.toLowerCase().includes(q) &&
-        !c.organizer.toLowerCase().includes(q)
+        !c.organizer.toLowerCase().includes(q) &&
+        !(c.summary ?? "").toLowerCase().includes(q) &&
+        !c.field.join(" ").toLowerCase().includes(q)
       )
         return false;
     }
