@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Contest } from "../../types/contest";
 import { CATEGORY_LABEL } from "../../types/contest";
 import { CATEGORY_COLORS } from "../../constants";
@@ -12,6 +12,14 @@ export default function ContestDetailModal({
   contest,
   onClose,
 }: ContestDetailModalProps) {
+  const [checked, setChecked] = useState<boolean[]>(() => {
+    if (!contest) return [];
+    const saved = localStorage.getItem(`checklist-${contest.id}`);
+    return saved
+      ? JSON.parse(saved)
+      : new Array(contest.checklist.length).fill(false);
+  });
+
   useEffect(() => {
     if (!contest) return;
     const handler = (e: KeyboardEvent) => {
@@ -36,6 +44,12 @@ export default function ContestDetailModal({
       month: "long",
       day: "numeric",
     });
+
+  const toggleCheck = (i: number) => {
+    const next = checked.map((v, idx) => (idx === i ? !v : v));
+    setChecked(next);
+    localStorage.setItem(`checklist-${contest.id}`, JSON.stringify(next));
+  };
 
   return (
     <div
@@ -96,7 +110,7 @@ export default function ContestDetailModal({
         <div className="px-7 py-5 space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[#F7F8FA] rounded-xl p-3.5">
-              <p className="text-[11px] text-[#9CA3AF] font-medium mb-1">
+              <p className="text-[11px] text-[#6B7280] font-medium mb-1">
                 접수 기간
               </p>
               <p className="text-sm font-semibold text-[#1A1A2E]">
@@ -108,7 +122,7 @@ export default function ContestDetailModal({
             </div>
             {contest.prize && (
               <div className="bg-[#F7F8FA] rounded-xl p-3.5">
-                <p className="text-[11px] text-[#9CA3AF] font-medium mb-1">
+                <p className="text-[11px] text-[#6B7280] font-medium mb-1">
                   상금 / 지원금
                 </p>
                 <p className="text-sm font-semibold text-[#1A1A2E]">
@@ -117,7 +131,7 @@ export default function ContestDetailModal({
               </div>
             )}
             <div className="bg-[#F7F8FA] rounded-xl p-3.5">
-              <p className="text-[11px] text-[#9CA3AF] font-medium mb-1">
+              <p className="text-[11px] text-[#6B7280] font-medium mb-1">
                 대상
               </p>
               <p className="text-sm font-semibold text-[#1A1A2E]">
@@ -125,7 +139,7 @@ export default function ContestDetailModal({
               </p>
             </div>
             <div className="bg-[#F7F8FA] rounded-xl p-3.5">
-              <p className="text-[11px] text-[#9CA3AF] font-medium mb-1">
+              <p className="text-[11px] text-[#6B7280] font-medium mb-1">
                 지역
               </p>
               <p className="text-sm font-semibold text-[#1A1A2E]">
@@ -134,9 +148,21 @@ export default function ContestDetailModal({
             </div>
           </div>
 
+          {/* [PP-036] eligibility 렌더링 추가 */}
+          {contest.eligibility && (
+            <div className="bg-[#F7F8FA] rounded-xl p-3.5">
+              <p className="text-[11px] text-[#6B7280] font-medium mb-1">
+                지원 자격
+              </p>
+              <p className="text-sm text-[#1A1A2E] leading-relaxed">
+                {contest.eligibility}
+              </p>
+            </div>
+          )}
+
           {contest.summary && (
             <div>
-              <p className="text-[11px] text-[#9CA3AF] font-medium mb-2">
+              <p className="text-[11px] text-[#6B7280] font-medium mb-2">
                 요약
               </p>
               <p className="text-sm text-[#6B7280] leading-relaxed">
@@ -145,9 +171,10 @@ export default function ContestDetailModal({
             </div>
           )}
 
+          {/* [PP-038] 체크리스트 localStorage 저장 */}
           {contest.checklist.length > 0 && (
             <div>
-              <p className="text-[11px] text-[#9CA3AF] font-medium mb-2">
+              <p className="text-[11px] text-[#6B7280] font-medium mb-2">
                 필요 서류
               </p>
               <div className="space-y-1.5">
@@ -156,8 +183,19 @@ export default function ContestDetailModal({
                     key={i}
                     className="flex items-center gap-2.5 text-sm text-[#1A1A2E] cursor-pointer"
                   >
-                    <input type="checkbox" className="rounded-sm w-4 h-4" />
-                    {item}
+                    <input
+                      type="checkbox"
+                      checked={checked[i] ?? false}
+                      onChange={() => toggleCheck(i)}
+                      className="rounded-sm w-4 h-4"
+                    />
+                    <span
+                      className={
+                        checked[i] ? "line-through text-[#9CA3AF]" : ""
+                      }
+                    >
+                      {item}
+                    </span>
                   </label>
                 ))}
               </div>

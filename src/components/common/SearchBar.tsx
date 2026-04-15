@@ -3,9 +3,14 @@ import { useState, useEffect, useRef } from "react";
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
+  autoFocus?: boolean;
 }
 
-export default function SearchBar({ value, onChange }: SearchBarProps) {
+export default function SearchBar({
+  value,
+  onChange,
+  autoFocus,
+}: SearchBarProps) {
   const [local, setLocal] = useState(value);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -39,6 +44,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         value={local}
         onChange={(e) => handleChange(e.target.value)}
         placeholder="공모전 검색..."
+        autoFocus={autoFocus}
         className="w-full pl-11 pr-4 py-2.5 bg-white rounded-full text-sm border-none outline-none transition-shadow duration-200 placeholder:text-[#9CA3AF]"
         style={{
           boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
