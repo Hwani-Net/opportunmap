@@ -1,0 +1,146 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap");
+
+@theme {
+  --color-contest: #3b5bdb;
+  --color-contest-bg: rgba(59, 91, 219, 0.06);
+  --color-hackathon: #0ca678;
+  --color-hackathon-bg: rgba(12, 166, 120, 0.06);
+  --color-startup: #e8590c;
+  --color-startup-bg: rgba(232, 89, 12, 0.06);
+  --color-grant: #e03131;
+  --color-grant-bg: rgba(224, 49, 49, 0.06);
+}
+
+:root {
+  --bg-page: #f7f8fa;
+  --bg-surface: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* FullCalendar Premium Overrides */
+.fc {
+  --fc-border-color: transparent !important;
+  --fc-today-bg-color: rgba(59, 91, 219, 0.04) !important;
+  --fc-neutral-bg-color: transparent !important;
+  --fc-page-bg-color: transparent !important;
+  font-family: "Inter", sans-serif !important;
+}
+
+.fc .fc-scrollgrid {
+  border: none !important;
+}
+.fc .fc-scrollgrid-section > td {
+  border: none !important;
+}
+.fc td,
+.fc th {
+  border-color: rgba(0, 0, 0, 0.04) !important;
+}
+.fc .fc-col-header-cell {
+  padding: 16px 0 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--text-muted) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+.fc .fc-daygrid-day-number {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  padding: 8px 10px !important;
+  color: var(--text-primary) !important;
+}
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+  background: #3b5bdb !important;
+  color: white !important;
+  border-radius: 50% !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 700 !important;
+}
+.fc .fc-daygrid-day-frame {
+  min-height: 120px !important;
+}
+.fc .fc-daygrid-day:hover {
+  background: rgba(59, 91, 219, 0.02) !important;
+}
+
+/* Calendar toolbar */
+.fc .fc-toolbar {
+  margin-bottom: 0 !important;
+  padding: 20px 24px !important;
+}
+.fc .fc-toolbar-title {
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: var(--text-primary) !important;
+}
+.fc .fc-button {
+  background: transparent !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: var(--text-secondary) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 14px !important;
+  box-shadow: none !important;
+  transition: all 0.15s ease !important;
+}
+.fc .fc-button:hover {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+.fc .fc-button-active {
+  background: var(--text-primary) !important;
+  color: white !important;
+  border-color: var(--text-primary) !important;
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background: var(--text-primary) !important;
+  color: white !important;
+  border-color: var(--text-primary) !important;
+}
+
+/* Event chips */
+.fc .fc-daygrid-event {
+  margin: 1px 4px !important;
+  border-radius: 4px !important;
+  border: none !important;
+}
+.fc .fc-daygrid-dot-event {
+  padding: 2px 0 !important;
+}
+.fc .fc-daygrid-more-link {
+  font-size: 11px !important;
+  color: #3b5bdb !important;
+  font-weight: 600 !important;
+}
