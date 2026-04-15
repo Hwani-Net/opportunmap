@@ -285,6 +285,30 @@ export default function HomePage() {
 
       <Footer />
 
+      {/* 딥링크 로딩 중 스켈레톤 모달 (PP-048) */}
+      {loading && detailId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setDetailId(null)}
+          />
+          <div
+            className="relative bg-white rounded-2xl w-full max-w-2xl mx-4 p-8 animate-pulse"
+            style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.18)" }}
+          >
+            <div className="h-4 bg-[#F3F4F6] rounded w-1/4 mb-4" />
+            <div className="h-7 bg-[#F3F4F6] rounded w-3/4 mb-6" />
+            <div className="h-4 bg-[#F3F4F6] rounded w-full mb-2" />
+            <div className="h-4 bg-[#F3F4F6] rounded w-5/6 mb-2" />
+            <div className="h-4 bg-[#F3F4F6] rounded w-2/3 mb-8" />
+            <div className="flex gap-3">
+              <div className="h-10 bg-[#F3F4F6] rounded-lg w-32" />
+              <div className="h-10 bg-[#F3F4F6] rounded-lg w-24" />
+            </div>
+          </div>
+        </div>
+      )}
+
       <ContestDetailModal
         key={selectedContest?.id ?? "closed"}
         contest={selectedContest}
