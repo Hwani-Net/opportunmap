@@ -313,19 +313,18 @@ export const SEED_DATA: SeedContest[] = [
     category: "hackathon",
     organizer: "매일경제미디어그룹·Anthropic",
     applicationStart: new Date("2026-01-01"),
-    applicationEnd: new Date("2026-04-30"),
+    applicationEnd: new Date("2026-03-20"),
     field: ["AI", "미디어", "소프트웨어"],
-    target: ["대학생", "개발자", "일반인"],
+    target: ["대학생", "취업준비생", "직장인", "일반인"],
     region: "서울",
     summary:
-      "매일경제 60년 축적 뉴스 데이터와 Anthropic Claude API를 결합해 사회적 가치를 창출하는 서비스를 개발하는 당일 해커톤. Claude API 크레딧 현장 지원.",
-    prize:
-      "대상 200만원 + $5,000 클로드 크레딧, 최우수상 150만원 + $3,000 클로드 크레딧",
+      "매일경제 60년 축적 뉴스 데이터와 Anthropic Claude API를 결합해 사회적 가치를 창출하는 서비스를 개발하는 당일 해커톤 (2026.3.20 종료). Claude API 크레딧 현장 지원.",
+    prize: "대상 200만원 + 매경 인턴십 기회, 앤스로픽 Claude API 전폭 지원",
     eligibility:
-      "뉴스 데이터와 AI 활용 서비스 개발에 관심 있는 누구나 (최대 4인 팀)",
-    applyUrl: "https://mk.co.kr",
-    sourceUrl:
-      "https://www.cse.cau.ac.kr/sub05/sub0506.php?nmode=view&code=oktomato_bbs06&uid=197",
+      "뉴스 데이터와 AI 활용 서비스 개발에 관심 있는 누구나 — 대학생, 취업준비생, 직장인 등 제한 없음 (개인 또는 최대 4인 팀)",
+    applyUrl:
+      "https://docs.google.com/forms/d/e/1FAIpQLSenXRHKVWd2WfDqecVNVTH7uWD0VJkynknE0GRSTXFpkDau_A/viewform",
+    sourceUrl: "https://n.news.naver.com/mnews/article/009/0005617474?sid=102",
     checklist: [
       "참가 신청서",
       "개인정보 동의서",
@@ -370,7 +369,8 @@ export const SEED_DATA: SeedContest[] = [
     prize: "총 3,500만원 (각 트랙 우승 500만원)",
     eligibility: "국내외 참가 가능 (팀 2~5인)",
     applyUrl: "https://ecosq.or.kr",
-    sourceUrl: "https://www.keiti.re.kr/site/keiti/ex/board/View.do?cbIdx=277&bcIdx=38446",
+    sourceUrl:
+      "https://www.keiti.re.kr/site/keiti/ex/board/View.do?cbIdx=277&bcIdx=38446",
     checklist: [
       "팀 등록서",
       "트랙 선택 및 아이디어 개요",
