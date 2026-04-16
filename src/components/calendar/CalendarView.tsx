@@ -11,6 +11,8 @@ import EventChip from "./EventChip";
 interface CalendarViewProps {
   contests: Contest[];
   onSelectContest: (id: string) => void;
+  hiddenCount?: number;
+  onClearHidden?: () => void;
 }
 
 const LEGEND_CATEGORIES = ["contest", "hackathon", "startup", "grant"] as const;
@@ -18,6 +20,8 @@ const LEGEND_CATEGORIES = ["contest", "hackathon", "startup", "grant"] as const;
 export default function CalendarView({
   contests,
   onSelectContest,
+  hiddenCount = 0,
+  onClearHidden,
 }: CalendarViewProps) {
   const events = useMemo(
     () =>
@@ -51,19 +55,29 @@ export default function CalendarView({
 
   return (
     <div className="space-y-4">
-      {/* Legend */}
-      <div className="flex items-center gap-4 flex-wrap">
-        {LEGEND_CATEGORIES.map((cat) => (
-          <div key={cat} className="flex items-center gap-1.5">
-            <span
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: CATEGORY_COLORS[cat].main }}
-            />
-            <span className="text-xs text-[#9CA3AF] font-medium">
-              {CATEGORY_LABEL[cat]}
-            </span>
-          </div>
-        ))}
+      {/* Legend + 숨김 해제 버튼 */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-4 flex-wrap">
+          {LEGEND_CATEGORIES.map((cat) => (
+            <div key={cat} className="flex items-center gap-1.5">
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: CATEGORY_COLORS[cat].main }}
+              />
+              <span className="text-xs text-[#9CA3AF] font-medium">
+                {CATEGORY_LABEL[cat]}
+              </span>
+            </div>
+          ))}
+        </div>
+        {hiddenCount > 0 && onClearHidden && (
+          <button
+            onClick={onClearHidden}
+            className="text-xs text-gray-500 underline hover:text-gray-700 whitespace-nowrap"
+          >
+            숨김 {hiddenCount}개 모두 표시
+          </button>
+        )}
       </div>
 
       {/* Calendar */}

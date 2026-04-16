@@ -1,4 +1,5 @@
 import { useMemo, useState, lazy, Suspense } from "react";
+import { ContestSections } from "../components/sections/ContestSections";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 const CalendarView = lazy(() => import("../components/calendar/CalendarView"));
@@ -8,6 +9,7 @@ import ContestDetailModal from "../components/detail/ContestDetailModal";
 import { useContests, filterContests } from "../hooks/useContests";
 import { useFilters } from "../hooks/useFilters";
 import { useBookmarks } from "../hooks/useBookmarks";
+import { useHiddenContests } from "../hooks/useHiddenContests";
 import { getContestById } from "../lib/firestore";
 
 export default function HomePage() {
@@ -23,6 +25,14 @@ export default function HomePage() {
     setSortBy,
   } = useFilters();
   const { bookmarks, toggle: toggleBookmark } = useBookmarks();
+  const {
+    hiddenIds,
+    hide: hideContest,
+    show: showContest,
+    isHidden,
+    hiddenCount,
+    clearAll: clearHidden,
+  } = useHiddenContests();
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
 
   const filtered = useMemo(
@@ -32,8 +42,8 @@ export default function HomePage() {
 
   const displayed = useMemo(() => {
     const base = showBookmarksOnly
-      ? filtered.filter((c) => bookmarks.has(c.id))
-      : filtered;
+      ? filtered.filter((c) => bookmarks.has(c.id) && !hiddenIds.includes(c.id))
+      : filtered.filter((c) => !hiddenIds.includes(c.id));
 
     // 정렬 (D2)
     return [...base].sort((a, b) => {
@@ -264,21 +274,33 @@ export default function HomePage() {
             </div>
           )
         ) : viewMode === "calendar" ? (
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center py-24">
-                <div className="w-6 h-6 border-2 border-[#3B5BDB] border-t-transparent rounded-full animate-spin" />
-              </div>
-            }
-          >
-            <CalendarView contests={displayed} onSelectContest={setDetailId} />
-          </Suspense>
+          <>
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center py-24">
+                  <div className="w-6 h-6 border-2 border-[#3B5BDB] border-t-transparent rounded-full animate-spin" />
+                </div>
+              }
+            >
+              <CalendarView
+                contests={displayed}
+                onSelectContest={setDetailId}
+                hiddenCount={hiddenCount}
+                onClearHidden={clearHidden}
+              />
+            </Suspense>
+            <ContestSections
+              contests={contests}
+              onSelectContest={(id) => setDetailId(id)}
+            />
+          </>
         ) : (
           <ListView
             contests={displayed}
             onSelectContest={setDetailId}
             bookmarks={bookmarks}
             onToggleBookmark={toggleBookmark}
+            onHide={hideContest}
           />
         )}
       </main>
@@ -315,6 +337,9 @@ export default function HomePage() {
         onClose={() => setDetailId(null)}
         bookmarks={bookmarks}
         onToggleBookmark={toggleBookmark}
+        isHidden={selectedContest ? isHidden(selectedContest.id) : false}
+        onHide={() => selectedContest && hideContest(selectedContest.id)}
+        onShow={() => selectedContest && showContest(selectedContest.id)}
       />
     </div>
   );

@@ -1,12 +1,15 @@
+import { EyeOff } from "lucide-react";
 import type { Contest } from "../../types/contest";
 import { CATEGORY_LABEL } from "../../types/contest";
 import { CATEGORY_COLORS } from "../../constants";
+import { ContestThumbnail } from "../common/ContestThumbnail";
 
 interface ContestCardProps {
   contest: Contest;
   onClick: (id: string) => void;
   isBookmarked?: boolean;
   onToggleBookmark?: (id: string) => void;
+  onHide?: () => void;
 }
 
 export default function ContestCard({
@@ -14,6 +17,7 @@ export default function ContestCard({
   onClick,
   isBookmarked = false,
   onToggleBookmark,
+  onHide,
 }: ContestCardProps) {
   const colors = CATEGORY_COLORS[contest.category];
   const deadline = contest.applicationEnd.toDate();
@@ -63,6 +67,9 @@ export default function ContestCard({
       }}
     >
       <div className="w-1 shrink-0" style={{ backgroundColor: colors.main }} />
+      <div className="pl-3 pt-3 pb-3 shrink-0 flex items-start">
+        <ContestThumbnail contest={contest} size="sm" />
+      </div>
       <div className="flex-1 p-4 flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1.5">
@@ -112,6 +119,19 @@ export default function ContestCard({
 
         <div className="flex flex-col items-end gap-1.5 shrink-0 max-w-[9rem]">
           <div className="flex items-center gap-1">
+            {/* 숨기기 버튼 */}
+            {onHide && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onHide();
+                }}
+                aria-label="캘린더에서 숨기기"
+                className="p-1 rounded text-[#9CA3AF] hover:text-[#6B7280] transition-colors focus:outline-none focus:ring-2 focus:ring-[#3B5BDB]"
+              >
+                <EyeOff size={14} />
+              </button>
+            )}
             {/* [PP-045] 북마크 버튼 */}
             {onToggleBookmark && (
               <button

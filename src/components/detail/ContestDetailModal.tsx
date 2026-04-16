@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import type { Contest } from "../../types/contest";
 import { CATEGORY_LABEL } from "../../types/contest";
 import { CATEGORY_COLORS } from "../../constants";
@@ -8,6 +9,9 @@ interface ContestDetailModalProps {
   onClose: () => void;
   bookmarks: Set<string>;
   onToggleBookmark: (id: string) => void;
+  isHidden?: boolean;
+  onHide?: () => void;
+  onShow?: () => void;
 }
 
 export default function ContestDetailModal({
@@ -15,6 +19,9 @@ export default function ContestDetailModal({
   onClose,
   bookmarks,
   onToggleBookmark,
+  isHidden = false,
+  onHide,
+  onShow,
 }: ContestDetailModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [checked, setChecked] = useState<boolean[]>(() => {
@@ -139,6 +146,16 @@ export default function ContestDetailModal({
             )}
           </div>
           <div className="flex items-center gap-1 shrink-0 ml-2">
+            {/* 숨기기 버튼 */}
+            {(onHide || onShow) && (
+              <button
+                onClick={isHidden ? onShow : onHide}
+                aria-label={isHidden ? "다시 표시" : "캘린더에서 숨기기"}
+                className="flex items-center gap-1 text-sm text-[#9CA3AF] hover:text-[#6B7280] transition-colors p-1.5 rounded focus:outline-none focus:ring-2 focus:ring-[#3B5BDB]"
+              >
+                {isHidden ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            )}
             {/* 북마크 버튼 (C1) */}
             <button
               onClick={() => onToggleBookmark(contest.id)}

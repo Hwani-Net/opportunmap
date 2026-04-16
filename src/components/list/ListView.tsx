@@ -6,6 +6,7 @@ interface ListViewProps {
   onSelectContest: (id: string) => void;
   bookmarks?: Set<string>;
   onToggleBookmark?: (id: string) => void;
+  onHide?: (id: string) => void;
 }
 
 export default function ListView({
@@ -13,6 +14,7 @@ export default function ListView({
   onSelectContest,
   bookmarks,
   onToggleBookmark,
+  onHide,
 }: ListViewProps) {
   if (contests.length === 0) {
     return (
@@ -36,6 +38,7 @@ export default function ListView({
           onClick={onSelectContest}
           isBookmarked={bookmarks?.has(c.id)}
           onToggleBookmark={onToggleBookmark}
+          onHide={onHide ? () => onHide(c.id) : undefined}
         />
       ))}
     </div>
