@@ -49,14 +49,7 @@ export function useFilters() {
   const VALID_AGE = ["", "youth", "senior", "any"] as const;
   const VALID_ORGANIZER = ["", "gov", "corp", "edu", "ngo"] as const;
   const VALID_TEAM = ["", "solo", "team", "both"] as const;
-  const VALID_EXCLUDE = [
-    "youth",
-    "senior",
-    "foreigner",
-    "disabled",
-    "female",
-    "male",
-  ];
+  const VALID_EXCLUDE = ["youth_excl", "college_excl", "young_excl"];
 
   const rawPrize = searchParams.get("prizeRange") ?? "";
   const rawDeadline = searchParams.get("deadline") ?? "";
