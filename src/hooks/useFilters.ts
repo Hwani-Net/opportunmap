@@ -49,6 +49,9 @@ export function useFilters() {
     applyStatus: (searchParams.get("applyStatus") ??
       "") as FilterState["applyStatus"],
     ageGroup: (searchParams.get("ageGroup") ?? "") as FilterState["ageGroup"],
+    organizerType: (searchParams.get("organizerType") ??
+      "") as FilterState["organizerType"],
+    teamType: (searchParams.get("teamType") ?? "") as FilterState["teamType"],
   };
 
   const viewMode: ViewMode =
@@ -102,6 +105,15 @@ export function useFilters() {
           if (updates.ageGroup !== undefined) {
             if (updates.ageGroup) next.set("ageGroup", updates.ageGroup);
             else next.delete("ageGroup");
+          }
+          if (updates.organizerType !== undefined) {
+            if (updates.organizerType)
+              next.set("organizerType", updates.organizerType);
+            else next.delete("organizerType");
+          }
+          if (updates.teamType !== undefined) {
+            if (updates.teamType) next.set("teamType", updates.teamType);
+            else next.delete("teamType");
           }
           return next;
         },

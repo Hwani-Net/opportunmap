@@ -94,6 +94,27 @@ const AGE_GROUP_OPTIONS: {
   { value: "open", label: "제한없음" },
 ];
 
+const ORGANIZER_TYPE_OPTIONS: {
+  value: FilterState["organizerType"];
+  label: string;
+}[] = [
+  { value: "", label: "전체" },
+  { value: "gov", label: "정부·공공기관" },
+  { value: "corp", label: "기업·민간" },
+  { value: "edu", label: "대학·학교" },
+  { value: "foundation", label: "재단·협회" },
+];
+
+const TEAM_TYPE_OPTIONS: {
+  value: FilterState["teamType"];
+  label: string;
+}[] = [
+  { value: "", label: "전체" },
+  { value: "solo", label: "개인 참가" },
+  { value: "team", label: "팀 참가" },
+  { value: "both", label: "개인·팀 모두" },
+];
+
 export default function FilterBar({
   filters,
   sortBy,
@@ -108,6 +129,8 @@ export default function FilterBar({
     filters.deadline,
     filters.applyStatus,
     filters.ageGroup,
+    filters.organizerType,
+    filters.teamType,
   ].filter(Boolean).length;
 
   const isFiltered =
@@ -183,6 +206,24 @@ export default function FilterBar({
       activeTags.push({
         label: `연령: ${opt.label}`,
         onRemove: () => onUpdate({ ageGroup: "" }),
+      });
+  }
+  if (filters.organizerType) {
+    const opt = ORGANIZER_TYPE_OPTIONS.find(
+      (o) => o.value === filters.organizerType,
+    );
+    if (opt)
+      activeTags.push({
+        label: `주최: ${opt.label}`,
+        onRemove: () => onUpdate({ organizerType: "" }),
+      });
+  }
+  if (filters.teamType) {
+    const opt = TEAM_TYPE_OPTIONS.find((o) => o.value === filters.teamType);
+    if (opt)
+      activeTags.push({
+        label: `참가: ${opt.label}`,
+        onRemove: () => onUpdate({ teamType: "" }),
       });
   }
 
@@ -355,6 +396,20 @@ export default function FilterBar({
             options={AGE_GROUP_OPTIONS}
             value={filters.ageGroup}
             onChange={(v) => onUpdate({ ageGroup: v })}
+          />
+          <div className="border-t border-[#F3F4F6]" />
+          <PillGroup
+            label="주최기관"
+            options={ORGANIZER_TYPE_OPTIONS}
+            value={filters.organizerType}
+            onChange={(v) => onUpdate({ organizerType: v })}
+          />
+          <div className="border-t border-[#F3F4F6]" />
+          <PillGroup
+            label="참가 형태"
+            options={TEAM_TYPE_OPTIONS}
+            value={filters.teamType}
+            onChange={(v) => onUpdate({ teamType: v })}
           />
         </div>
       )}

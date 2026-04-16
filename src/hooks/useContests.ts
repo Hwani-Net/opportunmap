@@ -13,6 +13,8 @@ export interface FilterState {
   deadline: "" | "thisWeek" | "thisMonth" | "3months";
   applyStatus: "" | "open" | "upcoming" | "closing7";
   ageGroup: "" | "youth" | "young" | "college" | "open";
+  organizerType: "" | "gov" | "corp" | "edu" | "foundation";
+  teamType: "" | "solo" | "team" | "both";
 }
 
 export const DEFAULT_FILTERS: FilterState = {
@@ -26,6 +28,8 @@ export const DEFAULT_FILTERS: FilterState = {
   deadline: "",
   applyStatus: "",
   ageGroup: "",
+  organizerType: "",
+  teamType: "",
 };
 
 export function useContests() {
@@ -143,6 +147,44 @@ export function filterContests(
           !t.includes("제한없음") &&
           !t.includes("누구나");
         if (hasRestriction) return false;
+      }
+    }
+
+    // 주최기관 유형 필터
+    if (filters.organizerType) {
+      const org = c.organizer;
+      if (filters.organizerType === "gov") {
+        const isGov = /부|처|청|공단|공사|진흥원|센터|재청|위원회/.test(org);
+        if (!isGov) return false;
+      }
+      if (filters.organizerType === "corp") {
+        const isCorp = /주식회사|\(주\)|㈜|그룹|Corp|Inc/.test(org);
+        if (!isCorp) return false;
+      }
+      if (filters.organizerType === "edu") {
+        const isEdu = /대학교|대학|학교|교육/.test(org);
+        if (!isEdu) return false;
+      }
+      if (filters.organizerType === "foundation") {
+        const isFoundation = /재단|협회|학회|연합|연맹/.test(org);
+        if (!isFoundation) return false;
+      }
+    }
+
+    // 참가 형태 필터
+    if (filters.teamType) {
+      const t = c.target.join(" ");
+      const hasSolo = t.includes("개인");
+      const hasTeam = t.includes("팀");
+      if (filters.teamType === "solo") {
+        if (!hasSolo || hasTeam) return false;
+      }
+      if (filters.teamType === "team") {
+        if (!hasTeam || hasSolo) return false;
+      }
+      if (filters.teamType === "both") {
+        const isBoth = (hasSolo && hasTeam) || c.target.length === 0;
+        if (!isBoth) return false;
       }
     }
 
