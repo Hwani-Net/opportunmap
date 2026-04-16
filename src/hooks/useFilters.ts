@@ -43,6 +43,12 @@ export function useFilters() {
     region: searchParams.get("region") ?? "",
     search: searchParams.get("q") ?? "",
     showPast: searchParams.get("showPast") === "true",
+    prizeRange: (searchParams.get("prizeRange") ??
+      "") as FilterState["prizeRange"],
+    deadline: (searchParams.get("deadline") ?? "") as FilterState["deadline"],
+    applyStatus: (searchParams.get("applyStatus") ??
+      "") as FilterState["applyStatus"],
+    ageGroup: (searchParams.get("ageGroup") ?? "") as FilterState["ageGroup"],
   };
 
   const viewMode: ViewMode =
@@ -79,6 +85,23 @@ export function useFilters() {
           if (updates.showPast !== undefined) {
             if (updates.showPast) next.set("showPast", "true");
             else next.delete("showPast");
+          }
+          if (updates.prizeRange !== undefined) {
+            if (updates.prizeRange) next.set("prizeRange", updates.prizeRange);
+            else next.delete("prizeRange");
+          }
+          if (updates.deadline !== undefined) {
+            if (updates.deadline) next.set("deadline", updates.deadline);
+            else next.delete("deadline");
+          }
+          if (updates.applyStatus !== undefined) {
+            if (updates.applyStatus)
+              next.set("applyStatus", updates.applyStatus);
+            else next.delete("applyStatus");
+          }
+          if (updates.ageGroup !== undefined) {
+            if (updates.ageGroup) next.set("ageGroup", updates.ageGroup);
+            else next.delete("ageGroup");
           }
           return next;
         },
