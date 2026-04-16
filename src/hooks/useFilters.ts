@@ -36,6 +36,36 @@ export function useFilters() {
       )
     : new Set(DEFAULT_FILTERS.categories);
 
+  // URL 파라미터 유효값 화이트리스트 (임의값 주입 방지)
+  const VALID_PRIZE = [
+    "",
+    "under50",
+    "50to200",
+    "200to500",
+    "over500",
+  ] as const;
+  const VALID_DEADLINE = ["", "week1", "week2", "month1", "month3"] as const;
+  const VALID_STATUS = ["", "open", "upcoming", "closed"] as const;
+  const VALID_AGE = ["", "youth", "senior", "any"] as const;
+  const VALID_ORGANIZER = ["", "gov", "corp", "edu", "ngo"] as const;
+  const VALID_TEAM = ["", "solo", "team", "both"] as const;
+  const VALID_EXCLUDE = [
+    "youth",
+    "senior",
+    "foreigner",
+    "disabled",
+    "female",
+    "male",
+  ];
+
+  const rawPrize = searchParams.get("prizeRange") ?? "";
+  const rawDeadline = searchParams.get("deadline") ?? "";
+  const rawStatus = searchParams.get("applyStatus") ?? "";
+  const rawAge = searchParams.get("ageGroup") ?? "";
+  const rawOrganizer = searchParams.get("organizerType") ?? "";
+  const rawTeam = searchParams.get("teamType") ?? "";
+  const rawExclude = searchParams.get("excludeTargets") ?? "";
+
   const filters: FilterState = {
     categories,
     field: searchParams.get("field") ?? "",
@@ -43,18 +73,33 @@ export function useFilters() {
     region: searchParams.get("region") ?? "",
     search: searchParams.get("q") ?? "",
     showPast: searchParams.get("showPast") === "true",
-    prizeRange: (searchParams.get("prizeRange") ??
-      "") as FilterState["prizeRange"],
-    deadline: (searchParams.get("deadline") ?? "") as FilterState["deadline"],
-    applyStatus: (searchParams.get("applyStatus") ??
-      "") as FilterState["applyStatus"],
-    ageGroup: (searchParams.get("ageGroup") ?? "") as FilterState["ageGroup"],
-    excludeTargets: searchParams.get("excludeTargets")
-      ? searchParams.get("excludeTargets")!.split(",").filter(Boolean)
+    prizeRange: (VALID_PRIZE.includes(rawPrize as (typeof VALID_PRIZE)[number])
+      ? rawPrize
+      : "") as FilterState["prizeRange"],
+    deadline: (VALID_DEADLINE.includes(
+      rawDeadline as (typeof VALID_DEADLINE)[number],
+    )
+      ? rawDeadline
+      : "") as FilterState["deadline"],
+    applyStatus: (VALID_STATUS.includes(
+      rawStatus as (typeof VALID_STATUS)[number],
+    )
+      ? rawStatus
+      : "") as FilterState["applyStatus"],
+    ageGroup: (VALID_AGE.includes(rawAge as (typeof VALID_AGE)[number])
+      ? rawAge
+      : "") as FilterState["ageGroup"],
+    excludeTargets: rawExclude
+      ? rawExclude.split(",").filter((v) => VALID_EXCLUDE.includes(v))
       : [],
-    organizerType: (searchParams.get("organizerType") ??
-      "") as FilterState["organizerType"],
-    teamType: (searchParams.get("teamType") ?? "") as FilterState["teamType"],
+    organizerType: (VALID_ORGANIZER.includes(
+      rawOrganizer as (typeof VALID_ORGANIZER)[number],
+    )
+      ? rawOrganizer
+      : "") as FilterState["organizerType"],
+    teamType: (VALID_TEAM.includes(rawTeam as (typeof VALID_TEAM)[number])
+      ? rawTeam
+      : "") as FilterState["teamType"],
   };
 
   const viewMode: ViewMode =

@@ -41,7 +41,7 @@ export function useAuth(): UseAuthReturn {
 
   return {
     user,
-    isAdmin: user?.email === ADMIN_EMAIL,
+    isAdmin: !!ADMIN_EMAIL && user?.email === ADMIN_EMAIL,
     loading,
     signIn,
     signOut,

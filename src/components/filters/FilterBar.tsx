@@ -350,6 +350,7 @@ export default function FilterBar({
           <button
             onClick={() => setShowAdvanced((v) => !v)}
             aria-expanded={showAdvanced}
+            aria-controls="advanced-filter-panel"
             className={`ml-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 border ${
               showAdvanced || activeAdvancedCount > 0
                 ? "bg-[#EEF2FF] text-[#3B5BDB] border-[#C5D0F5]"
@@ -381,6 +382,9 @@ export default function FilterBar({
       {/* 세부 필터 펼침 패널 */}
       {showAdvanced && (
         <div
+          id="advanced-filter-panel"
+          role="region"
+          aria-label="세부 필터"
           className="rounded-xl border border-[#E5E7EB] bg-white px-5 py-4 space-y-3"
           style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}
         >
@@ -411,6 +415,7 @@ export default function FilterBar({
             value={filters.ageGroup}
             onChange={(v) => onUpdate({ ageGroup: v })}
           />
+          <div className="border-t border-[#F3F4F6]" />
           <div className="flex flex-wrap items-start gap-2 pl-0">
             <span className="text-xs font-semibold text-[#6B7280] w-16 shrink-0 pt-0.5">
               제외 대상
@@ -421,9 +426,11 @@ export default function FilterBar({
                 return (
                   <label
                     key={opt.value}
+                    htmlFor={`excl-${opt.value}`}
                     className="flex items-center gap-2 text-sm cursor-pointer text-[#4B5563] hover:text-[#1A1A2E] select-none"
                   >
                     <input
+                      id={`excl-${opt.value}`}
                       type="checkbox"
                       checked={checked}
                       onChange={() => {
@@ -471,7 +478,7 @@ export default function FilterBar({
               <button
                 onClick={tag.onRemove}
                 aria-label={`${tag.label} 필터 제거`}
-                className="hover:text-[#1A1A2E] transition-colors ml-0.5"
+                className="hover:text-[#1A1A2E] transition-colors ml-0.5 p-1 -m-1"
               >
                 ×
               </button>
