@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seed": "npx tsx scripts/seed.ts"
+    "seed": "npx tsx scripts/seed.ts",
+    "reseed": "npx tsx scripts/cleanFirestore.ts"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.20",

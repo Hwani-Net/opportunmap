@@ -1,4 +1,4 @@
-import { initializeApp, cert, type ServiceAccount } from "firebase-admin/app";
+import { initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { SEED_DATA } from "../src/seed/seedData";
 import { config } from "dotenv";
@@ -11,31 +11,37 @@ if (!projectId) {
   process.exit(1);
 }
 
-// Use Application Default Credentials (gcloud auth)
 initializeApp({ projectId });
 const db = getFirestore();
 
-async function seed() {
-  console.log(`Seeding ${SEED_DATA.length} contests to project: ${projectId}`);
-
-  // Fetch existing titles to enable duplicate check
+async function cleanAndReseed() {
+  // Step 1: contests 컬렉션 전체 삭제
+  console.log("Step 1: contests 컬렉션 전체 삭제 중...");
   const snapshot = await db.collection("contests").get();
-  const existingTitles = new Set(
-    snapshot.docs.map((d) => d.data().title as string),
-  );
-  console.log(`  (기존 문서 ${existingTitles.size}건 확인 완료)`);
+  if (snapshot.empty) {
+    console.log("  (기존 문서 없음, 삭제 스킵)");
+  } else {
+    const BATCH_SIZE = 400; // Firestore 배치 최대 500
+    let deletedTotal = 0;
+    const docs = snapshot.docs;
 
+    for (let i = 0; i < docs.length; i += BATCH_SIZE) {
+      const batch = db.batch();
+      const chunk = docs.slice(i, i + BATCH_SIZE);
+      chunk.forEach((doc) => batch.delete(doc.ref));
+      await batch.commit();
+      deletedTotal += chunk.length;
+      console.log(`  삭제 진행: ${deletedTotal}/${docs.length}건`);
+    }
+    console.log(`  ✓ 총 ${deletedTotal}건 삭제 완료`);
+  }
+
+  // Step 2: SEED_DATA 전체 재투입
+  console.log(`\nStep 2: SEED_DATA ${SEED_DATA.length}건 재투입 중...`);
   let addCount = 0;
-  let skipCount = 0;
   let failCount = 0;
 
   for (const contest of SEED_DATA) {
-    if (existingTitles.has(contest.title)) {
-      console.log(`  ↷ 스킵(중복): ${contest.title}`);
-      skipCount++;
-      continue;
-    }
-
     try {
       const doc = {
         ...contest,
@@ -44,7 +50,6 @@ async function seed() {
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       };
-
       const ref = await db.collection("contests").add(doc);
       console.log(`  ✓ [${contest.category}] ${contest.title} (${ref.id})`);
       addCount++;
@@ -54,13 +59,11 @@ async function seed() {
     }
   }
 
-  console.log(
-    `\n추가: ${addCount}건, 스킵(중복): ${skipCount}건, 실패: ${failCount}건`,
-  );
+  console.log(`\n재투입 완료 — 추가: ${addCount}건, 실패: ${failCount}건`);
   process.exit(failCount > 0 ? 1 : 0);
 }
 
-seed().catch((err) => {
-  console.error("Seed failed:", err);
+cleanAndReseed().catch((err) => {
+  console.error("cleanFirestore failed:", err);
   process.exit(1);
 });
