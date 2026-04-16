@@ -49,6 +49,9 @@ export function useFilters() {
     applyStatus: (searchParams.get("applyStatus") ??
       "") as FilterState["applyStatus"],
     ageGroup: (searchParams.get("ageGroup") ?? "") as FilterState["ageGroup"],
+    excludeTargets: searchParams.get("excludeTargets")
+      ? searchParams.get("excludeTargets")!.split(",").filter(Boolean)
+      : [],
     organizerType: (searchParams.get("organizerType") ??
       "") as FilterState["organizerType"],
     teamType: (searchParams.get("teamType") ?? "") as FilterState["teamType"],
@@ -105,6 +108,11 @@ export function useFilters() {
           if (updates.ageGroup !== undefined) {
             if (updates.ageGroup) next.set("ageGroup", updates.ageGroup);
             else next.delete("ageGroup");
+          }
+          if (updates.excludeTargets !== undefined) {
+            if (updates.excludeTargets.length > 0)
+              next.set("excludeTargets", updates.excludeTargets.join(","));
+            else next.delete("excludeTargets");
           }
           if (updates.organizerType !== undefined) {
             if (updates.organizerType)

@@ -12,7 +12,8 @@ export interface FilterState {
   prizeRange: "" | "under50" | "50to200" | "200to500" | "over500";
   deadline: "" | "thisWeek" | "thisMonth" | "3months";
   applyStatus: "" | "open" | "upcoming" | "closing7";
-  ageGroup: "" | "youth" | "young" | "college" | "open";
+  ageGroup: "" | "youth" | "young" | "college" | "senior" | "open";
+  excludeTargets: string[];
   organizerType: "" | "gov" | "corp" | "edu" | "foundation";
   teamType: "" | "solo" | "team" | "both";
 }
@@ -28,6 +29,7 @@ export const DEFAULT_FILTERS: FilterState = {
   deadline: "",
   applyStatus: "",
   ageGroup: "",
+  excludeTargets: [],
   organizerType: "",
   teamType: "",
 };
@@ -141,12 +143,61 @@ export function filterContests(
       if (filters.ageGroup === "youth" && !t.includes("청소년")) return false;
       if (filters.ageGroup === "young" && !t.includes("청년")) return false;
       if (filters.ageGroup === "college" && !t.includes("대학")) return false;
+      if (filters.ageGroup === "senior") {
+        // 중장년(40+): target에 중장년/40세/일반인 포함 OR target이 비어있거나 제한없음/누구나
+        const isSeniorFriendly =
+          t.includes("중장년") ||
+          t.includes("40세") ||
+          t.includes("일반인") ||
+          c.target.length === 0 ||
+          t.includes("제한없음") ||
+          t.includes("누구나");
+        if (!isSeniorFriendly) return false;
+      }
       if (filters.ageGroup === "open") {
         const hasRestriction =
           c.target.length > 0 &&
           !t.includes("제한없음") &&
           !t.includes("누구나");
         if (hasRestriction) return false;
+      }
+    }
+
+    // 네거티브 필터 (특정 대상 제외)
+    if (filters.excludeTargets.length > 0) {
+      const t = c.target.join(" ");
+      if (filters.excludeTargets.includes("youth_excl")) {
+        // 청소년 전용: target이 청소년만 포함
+        const isYouthOnly =
+          c.target.length > 0 &&
+          t.includes("청소년") &&
+          !t.includes("청년") &&
+          !t.includes("대학") &&
+          !t.includes("일반") &&
+          !t.includes("누구나") &&
+          !t.includes("제한없음");
+        if (isYouthOnly) return false;
+      }
+      if (filters.excludeTargets.includes("college_excl")) {
+        // 대학생 전용: target이 대학생/대학원생 위주
+        const isCollegeOnly =
+          c.target.length > 0 &&
+          t.includes("대학") &&
+          !t.includes("청년") &&
+          !t.includes("일반") &&
+          !t.includes("누구나") &&
+          !t.includes("제한없음");
+        if (isCollegeOnly) return false;
+      }
+      if (filters.excludeTargets.includes("young_excl")) {
+        // 청년(39세 이하) 전용: target에 청년만 있고 일반 없음
+        const isYoungOnly =
+          c.target.length > 0 &&
+          t.includes("청년") &&
+          !t.includes("일반") &&
+          !t.includes("누구나") &&
+          !t.includes("제한없음");
+        if (isYoungOnly) return false;
       }
     }
 

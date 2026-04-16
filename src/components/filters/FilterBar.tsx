@@ -91,7 +91,14 @@ const AGE_GROUP_OPTIONS: {
   { value: "youth", label: "청소년(~19세)" },
   { value: "young", label: "청년(19-39세)" },
   { value: "college", label: "대학(원)생" },
+  { value: "senior", label: "중장년(40+)" },
   { value: "open", label: "제한없음" },
+];
+
+const EXCLUDE_TARGET_OPTIONS: { value: string; label: string }[] = [
+  { value: "youth_excl", label: "청소년 전용 제외" },
+  { value: "college_excl", label: "대학생 전용 제외" },
+  { value: "young_excl", label: "청년(39세 이하) 전용 제외" },
 ];
 
 const ORGANIZER_TYPE_OPTIONS: {
@@ -124,14 +131,15 @@ export default function FilterBar({
 }: FilterBarProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const activeAdvancedCount = [
-    filters.prizeRange,
-    filters.deadline,
-    filters.applyStatus,
-    filters.ageGroup,
-    filters.organizerType,
-    filters.teamType,
-  ].filter(Boolean).length;
+  const activeAdvancedCount =
+    [
+      filters.prizeRange,
+      filters.deadline,
+      filters.applyStatus,
+      filters.ageGroup,
+      filters.organizerType,
+      filters.teamType,
+    ].filter(Boolean).length + (filters.excludeTargets.length > 0 ? 1 : 0);
 
   const isFiltered =
     filters.field !== "" ||
@@ -225,6 +233,12 @@ export default function FilterBar({
         label: `참가: ${opt.label}`,
         onRemove: () => onUpdate({ teamType: "" }),
       });
+  }
+  if (filters.excludeTargets.length > 0) {
+    activeTags.push({
+      label: `제외: ${filters.excludeTargets.map((v) => EXCLUDE_TARGET_OPTIONS.find((o) => o.value === v)?.label ?? v).join(", ")}`,
+      onRemove: () => onUpdate({ excludeTargets: [] }),
+    });
   }
 
   return (
@@ -397,6 +411,37 @@ export default function FilterBar({
             value={filters.ageGroup}
             onChange={(v) => onUpdate({ ageGroup: v })}
           />
+          <div className="flex flex-wrap items-start gap-2 pl-0">
+            <span className="text-xs font-semibold text-[#6B7280] w-16 shrink-0 pt-0.5">
+              제외 대상
+            </span>
+            <div className="flex flex-wrap gap-3">
+              {EXCLUDE_TARGET_OPTIONS.map((opt) => {
+                const checked = filters.excludeTargets.includes(opt.value);
+                return (
+                  <label
+                    key={opt.value}
+                    className="flex items-center gap-2 text-sm cursor-pointer text-[#4B5563] hover:text-[#1A1A2E] select-none"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => {
+                        const next = checked
+                          ? filters.excludeTargets.filter(
+                              (v) => v !== opt.value,
+                            )
+                          : [...filters.excludeTargets, opt.value];
+                        onUpdate({ excludeTargets: next });
+                      }}
+                      className="rounded accent-[#3B5BDB]"
+                    />
+                    {opt.label}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
           <div className="border-t border-[#F3F4F6]" />
           <PillGroup
             label="주최기관"
